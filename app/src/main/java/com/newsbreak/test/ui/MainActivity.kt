@@ -8,10 +8,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.newsbreak.test.R
-import com.newsbreak.test.api.service.OpenApiService
 import com.newsbreak.test.ui.adapter.NewsAdapter
 import com.newsbreak.test.viewmodel.MainViewModel
 import com.newsbreak.test.viewmodel.ViewModelFactory
@@ -21,6 +21,9 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     @BindView(R.id.news_list)
     lateinit var newsList: RecyclerView
+
+    @BindView(R.id.swipe_layout)
+    lateinit var swipeLayout: SwipeRefreshLayout
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -47,11 +50,19 @@ class MainActivity : AppCompatActivity() {
             adapter = newsAdapter
         }
 
-        mainViewModel.newsList.observe(this, Observer<List<OpenApiService.News>> {
+        swipeLayout.setOnRefreshListener {
+            mainViewModel.loadNews()
+        }
+
+        mainViewModel.isRefreshing.observe(this, Observer {
+            swipeLayout.isRefreshing = it
+        })
+
+        mainViewModel.newsList.observe(this, Observer {
             newsAdapter.updateNews(it)
         })
 
-        mainViewModel.errorMessage.observe(this, Observer<String> {
+        mainViewModel.errorMessage.observe(this, Observer {
             Toast.makeText(this, it, Toast.LENGTH_LONG).show()
         })
     }

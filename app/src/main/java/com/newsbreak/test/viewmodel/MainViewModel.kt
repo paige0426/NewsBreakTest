@@ -15,20 +15,25 @@ class MainViewModel @Inject constructor(private val newsRepository: NewsReposito
 
     val newsList: MutableLiveData<List<OpenApiService.News>> = MutableLiveData()
     val errorMessage: MutableLiveData<String> = MutableLiveData()
+    val isRefreshing: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         loadNews()
     }
 
-    private fun loadNews() {
+    fun loadNews() {
+        isRefreshing.postValue(true)
+
         val disposable = newsRepository.loadNews()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 newsList.postValue(it.newsList)
+                isRefreshing.postValue(false)
             }, {
                 Timber.e(it)
                 errorMessage.postValue(it.toString())
+                isRefreshing.postValue(false)
             })
 
         mDisposable.add(disposable)
