@@ -28,7 +28,7 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient = OkHttpClient.Builder()
+    fun provideOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor) = OkHttpClient.Builder()
         .addInterceptor(httpLoggingInterceptor)
         .connectTimeout(CLIENT_TIME_OUT_SECS, TimeUnit.SECONDS)
         .writeTimeout(CLIENT_TIME_OUT_SECS, TimeUnit.SECONDS)
@@ -37,7 +37,7 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOpenApiService(client: OkHttpClient): OpenApiService = Retrofit.Builder()
+    fun provideOpenApiService(client: OkHttpClient) = Retrofit.Builder()
         .baseUrl(OPEN_API_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

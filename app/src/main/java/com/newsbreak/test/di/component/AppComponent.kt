@@ -2,10 +2,7 @@ package com.newsbreak.test.di.component
 
 import android.app.Application
 import com.newsbreak.test.NewsBreakApplication
-import com.newsbreak.test.di.module.ActivityModule
-import com.newsbreak.test.di.module.AppModule
-import com.newsbreak.test.di.module.NetworkModule
-import com.newsbreak.test.di.module.ViewModelModule
+import com.newsbreak.test.di.module.*
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
@@ -16,6 +13,7 @@ import javax.inject.Singleton
     AndroidInjectionModule::class,
     ActivityModule::class,
     AppModule::class,
+    DatabaseModule::class,
     NetworkModule::class,
     ViewModelModule::class
 ])

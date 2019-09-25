@@ -1,7 +1,10 @@
 package com.newsbreak.test.api.service
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import io.reactivex.Single
+import io.reactivex.Maybe
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -12,18 +15,27 @@ interface OpenApiService {
         @Query("token") token: String = TOKEN,
         @Query("cend") cend: String = CEND,
         @Query("cstart") cstart: String = CSTART
-    ): Single<Response>
+    ): Maybe<Response>
 
     data class Response(
         @SerializedName("result")
         val newsList: List<News>
     )
 
+    @Entity(tableName = "news_table")
     data class News(
+        @PrimaryKey
+        @ColumnInfo(name = "id")
+        val docid: String,
+        @ColumnInfo(name = "date")
         val date: String,
+        @ColumnInfo(name = "source")
         val source: String,
+        @ColumnInfo(name = "title")
         val title: String,
+        @ColumnInfo(name = "image")
         val image: String,
+        @ColumnInfo(name = "url")
         val url: String
     )
 

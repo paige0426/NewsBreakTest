@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         swipeLayout.setOnRefreshListener {
-            mainViewModel.loadNews()
+            mainViewModel.loadNews(true)
         }
 
         mainViewModel.isRefreshing.observe(this, Observer {

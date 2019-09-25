@@ -18,21 +18,26 @@ class MainViewModel @Inject constructor(private val newsRepository: NewsReposito
     val isRefreshing: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
-        loadNews()
+        loadNews(false)
     }
 
-    fun loadNews() {
+    fun loadNews(hasAppStarted: Boolean) {
         isRefreshing.postValue(true)
+        Timber.d("News refresh start")
 
-        val disposable = newsRepository.loadNews()
+        val disposable = newsRepository.loadNews(hasAppStarted)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                newsList.postValue(it.newsList)
+                Timber.d("Receive news from repository")
+                newsList.postValue(it)
                 isRefreshing.postValue(false)
             }, {
                 Timber.e(it)
                 errorMessage.postValue(it.toString())
+                isRefreshing.postValue(false)
+            }, {
+                Timber.d("News refresh complete")
                 isRefreshing.postValue(false)
             })
 
