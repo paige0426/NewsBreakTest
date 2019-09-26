@@ -21,30 +21,21 @@ class NewsRepository @Inject constructor(
             return if (hasAppStarted) Maybe.empty() else newsDao.getNews()
         }
 
-        return Maybe.create { emitter ->
-            newsDao.deleteAll().subscribe {
-                Timber.d("Clear database complete")
-                openApiService.loadNews().subscribe({
-                    Timber.d("Receive news from Internet")
-                    newsDao.insert(it.newsList).subscribe {
-                        Timber.d("Insert news into database complete")
-                        newsDao.getNews().subscribe({ news ->
-                            Timber.d("Fetch news from database and record timestamp $current")
-                            emitter.onSuccess(news)
-                            Utils.writeTimeStamp(context, current)
-                        }, { error ->
-                            Timber.e("Error when fetch news from database")
-                            emitter.onError(error)
-                        }, {
-                            Timber.d("Fetch news from database complete")
-                            emitter.onComplete()
-                        })
-                    }
-                }, {
-                    Timber.e("Error when fetch news from Internet")
-                    emitter.onError(it)
-                })
-            }
+        return Maybe.fromCallable {
+            // Remove expired news
+            newsDao.deleteAll().blockingAwait()
+
+            // Fetch news from Internet
+            val newsList = openApiService.loadNews().blockingGet().newsList
+
+            // Store it in database
+            newsDao.insert(newsList).blockingAwait()
+
+            // Record timestamp
+            Timber.d("Fetch news from database and record timestamp $current")
+            Utils.writeTimeStamp(context, current)
+
+            newsDao.getNews().blockingGet()
         }
     }
 
